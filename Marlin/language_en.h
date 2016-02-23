@@ -390,6 +390,9 @@
 #ifndef MSG_ZPROBE_OUT
   #define MSG_ZPROBE_OUT                      "Z probe out. bed"
 #endif
+#ifndef MSG_ZPROBE_TOOLOW
+  #define MSG_ZPROBE_TOOLOW                   "Z probe too low"
+#endif
 #ifndef MSG_ALL_POSITIONS_UNKNOWN
   #define MSG_ALL_POSITIONS_UNKNOWN           "Home X/Y/Z before proceeding"
 #endif

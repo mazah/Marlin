@@ -2622,11 +2622,20 @@ inline void gcode_G28() {
    */
   inline void gcode_G29() {
 
-    // Don't allow leveling without homing first
+    // Don't allow probing without homing first
     if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
       LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
       SERIAL_ECHO_START;
       SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
+      return;
+    }
+
+    // Don't allow probing if Z too low
+    if (current_position[Z_AXIS] < -1 * Z_PROBE_OFFSET_FROM_EXTRUDER) {
+      LCD_MESSAGEPGM(MSG_ZPROBE_TOOLOW);
+      SERIAL_ECHO_START;
+      SERIAL_ECHOLNPGM(MSG_ZPROBE_TOOLOW);
+      SERIAL_PROTOCOL(current_position[Z_AXIS] + 0.0001);
       return;
     }
 
@@ -2807,7 +2816,7 @@ inline void gcode_G28() {
       }
     #endif
 
-    // Don't allow auto-leveling without homing first
+    // Don't allow probing without homing first
     if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
       LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
       SERIAL_ECHO_START;
@@ -2815,9 +2824,19 @@ inline void gcode_G28() {
       return;
     }
 
+    // Don't allow probing if Z too low
+    if (current_position[Z_AXIS] < -1 * Z_PROBE_OFFSET_FROM_EXTRUDER) {
+      LCD_MESSAGEPGM(MSG_ZPROBE_TOOLOW);
+      SERIAL_ECHO_START;
+      SERIAL_ECHOLNPGM(MSG_ZPROBE_TOOLOW);
+      SERIAL_PROTOCOL(current_position[Z_AXIS] + 0.0001);
+      return;
+    }
+
     #if HAS_SERVO_ENDSTOPS
       raise_z_for_servo();
     #endif
+    // Servo must be deployed here since else Z is lowered too low
     deploy_z_probe(); // Engage Z Servo endstop if available
 
     int verbose_level = code_seen('V') ? code_value_short() : 1;
@@ -2891,7 +2910,8 @@ inline void gcode_G28() {
     #if ENABLED(Z_PROBE_SLED)
       dock_sled(false); // engage (un-dock) the Z probe
     #elif ENABLED(Z_PROBE_ALLEN_KEY) //|| SERVO_LEVELING
-      deploy_z_probe();
+      //No longer needed since z_probe already deployed
+      //deploy_z_probe();
     #endif
 
     st_synchronize();
@@ -3257,12 +3277,21 @@ inline void gcode_G28() {
     inline void gcode_G30() {
 
      // Don't allow probing without homing first
-     if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
-       LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
-       SERIAL_ECHO_START;
-       SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
-       return;
-     }
+      if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
+        LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
+        return;
+      }
+
+      // Don't allow probing if Z too low
+      if (current_position[Z_AXIS] < -1 * Z_PROBE_OFFSET_FROM_EXTRUDER) {
+        LCD_MESSAGEPGM(MSG_ZPROBE_TOOLOW);
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ZPROBE_TOOLOW);
+        SERIAL_PROTOCOL(current_position[Z_AXIS] + 0.0001);
+        return;
+      }
 
       #if HAS_SERVO_ENDSTOPS
         raise_z_for_servo();
