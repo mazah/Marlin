@@ -2622,6 +2622,19 @@ inline void gcode_G28() {
    */
   inline void gcode_G29() {
 
+    // Don't allow leveling without homing first
+    if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
+      LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
+      SERIAL_ECHO_START;
+      SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
+      return;
+    }
+
+    #if HAS_SERVO_ENDSTOPS
+      raise_z_for_servo();
+    #endif
+    deploy_z_probe(); // Engage Z Servo endstop if available
+
     static int probe_point = -1;
     MeshLevelingState state = code_seen('S') ? (MeshLevelingState)code_value_short() : MeshReport;
     if (state < 0 || state > 3) {
@@ -2733,6 +2746,11 @@ inline void gcode_G28() {
         mbl.z_values[iy][ix] = z;
 
     } // switch(state)
+
+    #if HAS_SERVO_ENDSTOPS
+      raise_z_for_servo();
+    #endif
+    stow_z_probe(); // Stow Z Servo endstop if available
   }
 
 #elif ENABLED(AUTO_BED_LEVELING_FEATURE)
@@ -2790,12 +2808,17 @@ inline void gcode_G28() {
     #endif
 
     // Don't allow auto-leveling without homing first
-    if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS]) {
-      LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
+    if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
+      LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
       SERIAL_ECHO_START;
-      SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
+      SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
       return;
     }
+
+    #if HAS_SERVO_ENDSTOPS
+      raise_z_for_servo();
+    #endif
+    deploy_z_probe(); // Engage Z Servo endstop if available
 
     int verbose_level = code_seen('V') ? code_value_short() : 1;
     if (verbose_level < 0 || verbose_level > 4) {
@@ -3219,6 +3242,11 @@ inline void gcode_G28() {
       }
     #endif
 
+    #if HAS_SERVO_ENDSTOPS
+      raise_z_for_servo();
+    #endif
+    stow_z_probe(); // Stow Z Servo endstop if available
+
   }
 
   #if DISABLED(Z_PROBE_SLED)
@@ -3227,6 +3255,15 @@ inline void gcode_G28() {
      * G30: Do a single Z probe at the current XY
      */
     inline void gcode_G30() {
+
+     // Don't allow probing without homing first
+     if (!axis_known_position[X_AXIS] || !axis_known_position[Y_AXIS] || !axis_known_position[Z_AXIS]) {
+       LCD_MESSAGEPGM(MSG_ALL_POSITIONS_UNKNOWN);
+       SERIAL_ECHO_START;
+       SERIAL_ECHOLNPGM(MSG_ALL_POSITIONS_UNKNOWN);
+       return;
+     }
+
       #if HAS_SERVO_ENDSTOPS
         raise_z_for_servo();
       #endif
