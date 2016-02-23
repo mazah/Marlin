@@ -2639,6 +2639,19 @@ inline void gcode_G28() {
       return;
     }
 
+    // Make sure the Z probe is within the physical limits
+    // NOTE: This doesn't necessarily ensure the Z probe is also within the bed!
+    float cpx = current_position[X_AXIS], cpy = current_position[Y_AXIS];
+    if (   cpx <= X_MIN_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+        || cpx >= X_MAX_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+        || cpy <= Y_MIN_POS - Y_PROBE_OFFSET_FROM_EXTRUDER
+        || cpy >= Y_MAX_POS - Y_PROBE_OFFSET_FROM_EXTRUDER) {
+      LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
+      SERIAL_ECHO_START;
+      SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
+      return;
+    }
+
     #if HAS_SERVO_ENDSTOPS
       raise_z_for_servo();
     #endif
@@ -2830,6 +2843,19 @@ inline void gcode_G28() {
       SERIAL_ECHO_START;
       SERIAL_ECHOLNPGM(MSG_ZPROBE_TOOLOW);
       SERIAL_PROTOCOL(current_position[Z_AXIS] + 0.0001);
+      return;
+    }
+
+    // Make sure the Z probe is within the physical limits
+    // NOTE: This doesn't necessarily ensure the Z probe is also within the bed!
+    float cpx = current_position[X_AXIS], cpy = current_position[Y_AXIS];
+    if (   cpx <= X_MIN_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+        || cpx >= X_MAX_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+        || cpy <= Y_MIN_POS - Y_PROBE_OFFSET_FROM_EXTRUDER
+        || cpy >= Y_MAX_POS - Y_PROBE_OFFSET_FROM_EXTRUDER) {
+      LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
+      SERIAL_ECHO_START;
+      SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
       return;
     }
 
@@ -3290,6 +3316,19 @@ inline void gcode_G28() {
         SERIAL_ECHO_START;
         SERIAL_ECHOLNPGM(MSG_ZPROBE_TOOLOW);
         SERIAL_PROTOCOL(current_position[Z_AXIS] + 0.0001);
+        return;
+      }
+
+      // Make sure the Z probe is within the physical limits
+      // NOTE: This doesn't necessarily ensure the Z probe is also within the bed!
+      float cpx = current_position[X_AXIS], cpy = current_position[Y_AXIS];
+      if (   cpx <= X_MIN_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+          || cpx >= X_MAX_POS - X_PROBE_OFFSET_FROM_EXTRUDER
+          || cpy <= Y_MIN_POS - Y_PROBE_OFFSET_FROM_EXTRUDER
+          || cpy >= Y_MAX_POS - Y_PROBE_OFFSET_FROM_EXTRUDER) {
+        LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
         return;
       }
 
