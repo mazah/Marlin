@@ -2771,6 +2771,8 @@ inline void gcode_G28() {
 
     #if HAS_SERVO_ENDSTOPS
       raise_z_for_servo();
+      raise_z_after_probing();
+      sync_plan_position();
     #endif
     stow_z_probe(); // Stow Z Servo endstop if available
   }
@@ -3290,6 +3292,8 @@ inline void gcode_G28() {
 
     #if HAS_SERVO_ENDSTOPS
       raise_z_for_servo();
+      raise_z_after_probing();
+      sync_plan_position();
     #endif
     stow_z_probe(); // Stow Z Servo endstop if available
 
@@ -3355,7 +3359,8 @@ inline void gcode_G28() {
       clean_up_after_endstop_move();
 
       #if HAS_SERVO_ENDSTOPS
-        raise_z_for_servo();
+        raise_z_after_probing();
+        sync_plan_position();
       #endif
       stow_z_probe(false); // Retract Z Servo endstop if available
     }
