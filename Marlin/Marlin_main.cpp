@@ -1752,9 +1752,10 @@ static void setup_for_endstop_move() {
     void raise_z_for_servo() {
       float zpos = current_position[Z_AXIS], z_dest = Z_RAISE_BEFORE_PROBING;
       z_dest += axis_known_position[Z_AXIS] ? -1 * zprobe_zoffset : zpos; // zprobe offset is negative so changing it to positive
-      if (zpos < z_dest) do_blocking_move_to_z(z_dest); // also updates current_position
+      if (zpos < z_dest) { 
+        do_blocking_move_to_z(z_dest); // also updates current_position
+      }
     }
-
   #endif
 
 #endif // AUTO_BED_LEVELING_FEATURE
@@ -2652,9 +2653,6 @@ inline void gcode_G28() {
       return;
     }
 
-    #if HAS_SERVO_ENDSTOPS
-      raise_z_for_servo();
-    #endif
     deploy_z_probe(); // Engage Z Servo endstop if available
 
     static int probe_point = -1;
@@ -2769,11 +2767,6 @@ inline void gcode_G28() {
 
     } // switch(state)
 
-    #if HAS_SERVO_ENDSTOPS
-      raise_z_for_servo();
-      raise_z_after_probing();
-      sync_plan_position();
-    #endif
     stow_z_probe(); // Stow Z Servo endstop if available
   }
 
@@ -2861,10 +2854,6 @@ inline void gcode_G28() {
       return;
     }
 
-    #if HAS_SERVO_ENDSTOPS
-      raise_z_for_servo();
-    #endif
-    // Servo must be deployed here since else Z is lowered too low
     deploy_z_probe(); // Engage Z Servo endstop if available
 
     int verbose_level = code_seen('V') ? code_value_short() : 1;
@@ -3290,11 +3279,6 @@ inline void gcode_G28() {
       }
     #endif
 
-    #if HAS_SERVO_ENDSTOPS
-      raise_z_for_servo();
-      raise_z_after_probing();
-      sync_plan_position();
-    #endif
     stow_z_probe(); // Stow Z Servo endstop if available
 
   }
@@ -3336,9 +3320,6 @@ inline void gcode_G28() {
         return;
       }
 
-      #if HAS_SERVO_ENDSTOPS
-        raise_z_for_servo();
-      #endif
       deploy_z_probe(); // Engage Z Servo endstop if available
 
       st_synchronize();
@@ -3358,10 +3339,6 @@ inline void gcode_G28() {
 
       clean_up_after_endstop_move();
 
-      #if HAS_SERVO_ENDSTOPS
-        raise_z_after_probing();
-        sync_plan_position();
-      #endif
       stow_z_probe(false); // Retract Z Servo endstop if available
     }
 
